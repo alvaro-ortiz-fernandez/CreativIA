@@ -132,70 +132,8 @@
             <p class="lead fw-light mt-3">CreativIA está construido sobre los siguientes frameworks, herramientas y APIs.</p>
         </div>
     </div>
-    <div class="col-xxl-4 col-md-6">
-        <div class="text-center">
-            <a href="https://angular.dev/" target="_blank">
-                <img height="55" src="assets/images/techs/angular.png" alt="Angular">
-            </a>
-            <div>
-                <h5 class="mt-2 mb-2">Angular</h5>
-                <p class="text-muted">Framework de desarrollo frontend en el que se basa la arquitectura de la aplicación web. Gestiona aspectos como la navegación y la interacción con el usuario.</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-xxl-4 col-md-6">
-        <div class="text-center">
-            <a href="https://firebase.google.com/?hl=es-419" target="_blank">
-                <img height="55" src="assets/images/techs/firebase.png" alt="Firebase">
-            </a>
-            <div>
-                <h5 class="mt-2 mb-2">Firebase</h5>
-                <p class="text-muted">Plataforma backend en la nube empleada para la gestión de datos (almacenamiento de paletas, sincronización en vivo...).</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-xxl-4 col-md-6">
-        <div class="text-center">
-            <a href="https://getbootstrap.com/" target="_blank">
-                <img height="55" src="assets/images/techs/bootstrap.png" alt="Bootstrap">
-            </a>
-            <div>
-                <h5 class="mt-2 mb-2">Bootstrap</h5>
-                <p class="text-muted">Framework CSS que facilita el diseño web responsive a través de una gama de componentes y estilos para la creación de interfaces.</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-xxl-4 col-md-6">
-        <div class="text-center">
-            <a href="http://colormind.io/" target="_blank">
-                <img height="55" src="assets/images/techs/ai.png" alt="AI">
-            </a>
-            <div>
-                <h5 class="mt-2 mb-2">The Color API & Colormind</h5>
-                <p class="text-muted">APIs especializadas en análisis y generación cromática. Proporcionan esquemas de color, convierten valores y asisten en la creación de paletas basadas en conceptos visuales.</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-xxl-4 col-md-6">
-        <div class="text-center">
-            <a href="https://github.com/alvaro-ortiz-fernandez/CreativIA" target="_blank">
-                <img height="55" src="assets/images/techs/github.png" alt="GitHub">
-            </a>
-            <div>
-                <h5 class="mt-2 mb-2">GitHub</h5>
-                <p class="text-muted">Plataforma de control de versiones del código fuente, documentación del proyecto y colaboración. Ofrece trazabilidad de cambios y publicación abierta.</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-xxl-4 col-md-6">
-        <div class="text-center">
-            <a href="https://code.visualstudio.com/" target="_blank">
-                <img height="55" src="assets/images/techs/vscode.png" alt="Visual Studio Code">
-            </a>
-            <div>
-                <h5 class="mt-2 mb-2">Visual Studio Code</h5>
-                <p class="text-muted">Entorno de desarrollo utilizado para la implementación del proyecto. Ofrece soporte y depuración integrada al resto de tecnologías que componen CreativIA.</p>
-            </div>
-        </div>
-    </div>
+
+    @for (tech of technologies; track tech.title) {
+        <app-tech-card [tech]="tech"></app-tech-card>
+    }
 </section>
