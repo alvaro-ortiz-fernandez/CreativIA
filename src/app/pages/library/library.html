@@ -1,1 +1,55 @@
-<p>library works!</p>
+<section class="row gx-5 justify-content-center">
+    <article class="col-lg-11 col-xl-9 col-xxl-8">
+        <!-- Título -->
+        <div class="text-center mb-5">
+            <h1 class="display-5 fw-bolder mb-0"><span class="text-gradient d-inline">Biblioteca de Paletas</span></h1>
+            <p class="lead fw-light mt-3">Explora las paletas creadas por ti u otros usuarios. Visualiza cada combinación de colores y adáptalas a tus preferencias para tus proyectos creativos.</p>
+        </div>
+
+        <!-- Listado de paletas -->
+        <div>
+            <h2 class="text-primary fw-bolder mb-4">03-12-2025</h2>
+            
+            @for (colorPalette of colorPalettes; track colorPalette.id) {
+            <div class="card shadow border-0 rounded-4 mb-5">
+                <div class="card-body p-5">
+                    <!-- De -->
+                    <div class="row mb-3 align-items-center gx-5">
+                        <div class="col-lg-4 text-center text-lg-start mb-4 mb-lg-0">
+                            <div class="bg-light p-4 rounded-4">
+                                <div class="fw-bolder" [style.color]="colorPalette.baseColor">{{ colorPalette.baseColor }}</div>
+                                <div class="small fst-italic text-muted">Color base</div>
+                                <div class="small fw-bolder mt-2">{{ colorPalette.scheme }}</div>
+                                <div class="small fst-italic text-muted">Esquema cromático</div>
+                            </div>
+                        </div>
+                        <div class="col-lg-8">
+                            <div class="fw-bolder">{{ colorPalette.description }}</div>
+                            <div class="small text-muted fst-italic">
+                                <i class="bi bi-stars me-1"></i>
+                                <span>{{ colorPalette.context }}</span>
+                            </div>
+                            <div class="mt-2">{{ colorPalette.interpretation }}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="row align-items-center">
+                        <!-- Swatch de colores -->
+                        @for (color of colorPalette.colors; track color.hex) {
+                        <div class="col mt-3">
+                            <div class="bg-light rounded-3 text-center">
+                                <div [style.background]="color.hex" style="height: 100px" class="rounded-top"></div>
+                                <div class="p-2">
+                                    <div class="small fw-bolder">{{ color.hex }}</div>
+                                    <div class="small text-muted">{{ color.name }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        }
+                    </div>
+                </div>
+            </div>
+            }
+        </div>
+    </article>
+</section>
