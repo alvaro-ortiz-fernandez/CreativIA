@@ -30,10 +30,22 @@ export class Home {
       link: 'https://getbootstrap.com/'
     },
     {
-      title: 'The Color API & Colormind',
-      description: 'APIs especializadas en análisis y generación cromática empleadas para obtener esquemas de color y asistir en la creación automática de paletas.',
+      title: 'Gemini',
+      description: 'API de inteligencia artificial de Google utilizada para generación de texto a través de la interpretación de contenido de usuarios.',
+      image: 'assets/images/techs/gemini.png',
+      link: 'https://ai.google.dev/gemini-api/docs?hl=es-419'
+    },
+    {
+      title: 'Text2Color',
+      description: 'API de conversión de inputs en lenguaje natural a paletas de colores adaptadas a conceptos creativos.',
+      image: 'assets/images/techs/text-2-color.png',
+      link: 'https://text2color.com/'
+    },
+    {
+      title: 'The Color API',
+      description: 'API de generación de esquemas cromáticos a partir de colores especificados.',
       image: 'assets/images/techs/ai.png',
-      link: 'http://colormind.io/'
+      link: 'https://www.thecolorapi.com/'
     },
     {
       title: 'GitHub',
