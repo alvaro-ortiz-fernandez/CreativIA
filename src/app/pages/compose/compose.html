@@ -1,1 +1,282 @@
-<p>compose works!</p>
+<section class="row gx-5 justify-content-center">
+    <article class="col-lg-11 col-xl-9 col-xxl-8">
+        <div class="text-center mb-5">
+            <h1 class="display-5 fw-bolder mb-0"><span class="text-gradient d-inline">Crear paleta de colores</span></h1>
+            <p class="lead fw-light mt-3">Sigue los pasos del asistente para generar una gama cromática a través de la inteligencia artificial.</p>
+        </div>
+
+        <div class="row gx-5 justify-content-center">
+            <div class="col-lg-10 col-xl-10">
+                <!-- =================================================================== -->
+                <!-- PASO 1 — Concepto / Prompt -->
+                <!-- =================================================================== -->
+                <div class="card border-dark mb-4">
+                    <div class="overlay">
+                        <a type="button" class="cursor-default">
+                            <i class="bi bi-check fs-1 px-2 text-success"></i>
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold">Paso 1 — Concepto creativo</h5>
+                        <h6 class="card-subtitle mb-3 text-body-secondary">Define los parámetros para la elección del color</h6>
+                        
+                        <!-- Prompt base -->
+                        <div class="mb-3">
+                            <label for="promptInput" class="form-label">Describe un contexto, emoción o estilo visual</label>
+
+                            <input type="text" id="promptInput" class="form-control"
+                                placeholder="Ej: nostalgia urbana, minimalismo cálido..."
+                                required minlength="1">
+                        </div>
+
+                        <!-- IA Prompt -->
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <label for="aiPrompt" class="form-label mb-0">
+                                    (Opcional) Sugerencia de la IA
+                                </label>
+
+                                <button type="button" class="btn btn-outline-primary btn-sm ms-3">
+                                    <span>Generar prompt</span>
+                                    <i class="bi bi-stars ms-1"></i>
+                                </button>
+                            </div>
+
+                            <textarea id="aiPrompt" class="form-control" rows="2"
+                                placeholder="Sugerencia generada por la IA..."
+                                disabled readonly
+                            ></textarea>
+                        </div>
+                        
+                        <!-- Obtener color base -->
+                        <button type="button" class="btn btn-primary">
+                            <span>Obtener color base</span>
+                            <i class="bi bi-stars ms-1"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- =================================================================== -->
+                <!-- PASO 2 — Color Base -->
+                <!-- =================================================================== -->
+                <div class="card border-dark mb-4">
+                    <div class="overlay">
+                        <a type="button" class="mt-2">
+                            <i class="bi bi-pencil-square fs-3 px-3 text-gray"></i>
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold">Paso 2 — Color base</h5>
+                        <h6 class="card-subtitle mb-4 text-body-secondary">Genera un color base a partir del concepto creativo</h6>
+
+                        <div class="row mb-3">
+                            <!-- Swatch -->
+                            <div class="col-md-4 text-center">
+                                <div id="colorPreview" class="rounded mb-2 border"
+                                    style="height: 157px; background:#eeeeee;"></div>
+
+                                <small class="text-muted">Previsualización</small>
+                            </div>
+
+                            <div class="col-md-8">
+                                <div class="row">
+                                    <!-- HEX -->
+                                    <div class="col-md-6 mb-3">
+                                        <label for="hexOutput" class="form-label">Código hexadecimal</label>
+
+                                        <input type="text" id="hexOutput" class="form-control"
+                                            value="#FFFFFF" pattern="^#([A-Fa-f0-9]{6})$">
+                                    </div>
+
+                                    <!-- RGB -->
+                                    <div class="col-md-6 mb-3">
+                                        <label for="hexOutput" class="form-label">Código RGB</label>
+
+                                        <input type="text" id="rgbOutput" class="form-control"
+                                            value="238, 238, 238" pattern="^#([0-9]{6})$">
+                                    </div>
+
+                                    <!-- Color Picker -->
+                                    <div class="col-md-6">
+                                        <label for="colorPicker" class="form-label">Ajuste manual</label>
+
+                                        <input type="color" id="colorPicker"
+                                            class="form-control form-control-color"
+                                            value="#eeeeee" title="Selecciona un color">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-8">
+                                <!-- Definir paleta -->
+                                <button type="button" class="btn btn-gray">
+                                    <i class="bi bi-gear-fill me-2"></i>
+                                    <span>Definir paleta de color</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- =================================================================== -->
+                <!-- PASO 3 — Construcción de Paleta -->
+                <!-- =================================================================== -->
+                <div class="card border-dark mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold">Paso 3 — Construcción cromática</h5>
+                        <h6 class="card-subtitle mb-1 text-body-secondary">Selecciona los parámetros de creación de la paleta de color</h6>
+
+                        <div class="row">
+                            <!-- Esquema -->
+                            <div class="col-md-6 mt-3">
+                                <label for="schemeSelect" class="form-label">
+                                    Tipo de esquema cromático
+                                </label>
+
+                                <select id="schemeSelect" class="form-select" required>
+                                    <option value="" selected disabled>Selecciona un esquema...</option>
+                                    <option value="complementary">Complementario</option>
+                                    <option value="analogic">Análogo</option>
+                                    <option value="triad">Triádico</option>
+                                    <option value="monochrome">Monocromático</option>
+                                    <option value="tetrad">Tetrádico</option>
+                                </select>
+                            </div>
+
+                            <!-- Tonalidades -->
+                            <div class="col-md-6 mt-3">
+                                <label for="numColors" class="form-label">Número de tonalidades</label>
+
+                                <input type="range" id="numColors" class="form-range"
+                                    min="1" max="10" step="1" value="5">
+
+                                <div class="d-flex justify-content-between">
+                                    <span>1</span>
+                                    <span>5</span>
+                                    <span>10</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Generar paleta -->
+                        <button type="button" class="btn btn-success mt-3">
+                            <span>Generar paleta final</span>
+                            <i class="bi bi-stars ms-1"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- =================================================================== -->
+                <!-- PASO 4 — Resultado final -->
+                <!-- =================================================================== -->
+                <div class="card border-dark mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold">Paso 4 — Paleta resultante</h5>
+                        <h6 class="card-subtitle mb-4 text-body-secondary">Visualiza la paleta cromática generada</h6>
+
+                        <div class="row row-cols-2 row-cols-md-5 g-3 mb-4">
+                            <!-- Swatch de colores resultante -->
+                            <div class="col">
+                                <div class="bg-light rounded-3 text-center">
+                                    <div style="background:#cccccc; height:100px;" class="rounded-top"></div>
+                                    <div class="p-2">
+                                        <div class="small fw-bolder">#CCCCCC</div>
+                                        <div class="small text-muted">Gris suave</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="bg-light rounded-3 text-center">
+                                    <div style="background:#cccccc; height:100px;" class="rounded-top"></div>
+                                    <div class="p-2">
+                                        <div class="small fw-bolder">#CCCCCC</div>
+                                        <div class="small text-muted">Gris suave</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="bg-light rounded-3 text-center">
+                                    <div style="background:#cccccc; height:100px;" class="rounded-top"></div>
+                                    <div class="p-2">
+                                        <div class="small fw-bolder">#CCCCCC</div>
+                                        <div class="small text-muted">Gris suave</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="bg-light rounded-3 text-center">
+                                    <div style="background:#cccccc; height:100px;" class="rounded-top"></div>
+                                    <div class="p-2">
+                                        <div class="small fw-bolder">#CCCCCC</div>
+                                        <div class="small text-muted">Gris suave</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="bg-light rounded-3 text-center">
+                                    <div style="background:#cccccc; height:100px;" class="rounded-top"></div>
+                                    <div class="p-2">
+                                        <div class="small fw-bolder">#CCCCCC</div>
+                                        <div class="small text-muted">Gris suave</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Interpretación de la IA -->
+                        <div class="mt-4">
+                            <label for="aiInterpretation" class="form-label">
+                                Lectura interpretativa
+                            </label>
+
+                            <textarea id="aiInterpretation" class="form-control" rows="4"
+                                placeholder="Análisis generado por IA..."
+                                disabled readonly
+                            ></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- =================================================================== -->
+                <!-- REINICIAR COMPOSICIÓN
+                <!-- =================================================================== -->
+                <div class="text-end">
+                    <button class="btn btn-outline-dark mb-2" routerLink="/library">
+                        <i class="bi bi-journals me-2"></i>
+                        <span class="px-2">Explorar biblioteca</span>
+                    </button>
+                    <button class="btn btn-outline-danger mb-2 ms-3" data-bs-toggle="modal" data-bs-target="#modalReinicio">
+                        <i class="bi bi-arrow-clockwise me-2"></i>
+                        <span>Reiniciar composición</span>
+                    </button>
+                </div>
+
+                <div class="modal" tabindex="-1" id="modalReinicio">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Reiniciar composición</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                        <div class="modal-body">
+                            <p class="mb-0">¿Está seguro de que desea comenzar una nueva composición?</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+                                <i class="bi bi-x-lg me-2"></i>
+                                <span>Cerrar</span>
+                            </button>
+                            <button type="button" class="btn btn-danger">
+                                <i class="bi bi-trash me-2"></i>
+                                <span>Reiniciar</span>
+                            </button>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </article>
+</section>
