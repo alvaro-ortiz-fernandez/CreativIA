@@ -1,0 +1,22 @@
+<button type="button" [class]="btnClass" [disabled]="isDisabled">
+    <!-- Icono o spinner al inicio -->
+    @if (iconPosition === 'start') {
+        @if (loading) {
+            <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+        } @else {
+            <i [class]="iconClass + ' me-2'"></i>
+        }
+    }
+
+    <!-- Texto del botón -->
+    <span>{{ label }}</span>
+
+    <!-- Icono o spinner al final -->
+    @if (iconPosition === 'end') {
+        @if (loading) {
+            <span class="spinner-border spinner-border-sm ms-1" aria-hidden="true"></span>
+        } @else {
+            <i [class]="iconClass + ' ms-1'"></i>
+        }
+    }
+</button>
