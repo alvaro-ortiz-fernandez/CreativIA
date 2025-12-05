@@ -30,5 +30,5 @@ export interface SpinnerConfig {
 export enum SpinnerSize {
   SM = 'SM',
   MD = 'MD',
-  LG = 'LG',
+  LG = 'LG'
 }

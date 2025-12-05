@@ -1,4 +1,4 @@
-<button type="button" [class]="btnClass" [disabled]="isDisabled">
+<button type="button" [class]="btnClass" [class.disabled]="isDisabled" [disabled]="isDisabled">
     <!-- Icono o spinner al inicio -->
     @if (iconPosition === 'start') {
         @if (loading) {

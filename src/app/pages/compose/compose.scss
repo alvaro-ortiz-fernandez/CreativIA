@@ -1,0 +1,21 @@
+.hidden {
+  display: none !important;
+}
+
+.fade-in {
+  opacity: 0;
+  will-change: opacity, transform;
+}
+
+.fade-in.show {
+  animation: fadeInOpacity 1s ease forwards;
+}
+
+@keyframes fadeInOpacity {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

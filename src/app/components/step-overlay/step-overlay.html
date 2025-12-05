@@ -1,0 +1,13 @@
+@if (!isEnabled()) {
+<div class="overlay">
+    <a type="button"  (click)="edit()"
+        [class.mt-2]="isEditable()"
+        [class.cursor-default]="!isActionable()">
+        @if (isEditable()) {
+        <i class="bi bi-pencil-square fs-3 px-3 text-gray"></i>
+        } @else if (isCompleted()) {
+        <i class="bi bi-check fs-1 px-2 text-success"></i>
+        }
+    </a>
+</div>
+}

@@ -36,6 +36,6 @@ export class FirebaseService {
       }
     ];
 
-    return of(colorPalettes).pipe(delay(3000));
+    return of(colorPalettes).pipe(delay(2000));
   }
 }

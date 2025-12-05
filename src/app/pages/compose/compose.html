@@ -10,12 +10,11 @@
                 <!-- =================================================================== -->
                 <!-- PASO 1 — Concepto / Prompt -->
                 <!-- =================================================================== -->
-                <div class="card border-dark mb-4">
-                    <div class="overlay">
-                        <a type="button" class="cursor-default">
-                            <i class="bi bi-check fs-1 px-2 text-success"></i>
-                        </a>
-                    </div>
+                <div class="card border-dark fade-in mb-4"
+                    [class.show]="!hide(StepType.CONCEPT)" [class.hidden]="hide(StepType.CONCEPT)">
+                    <app-step-overlay [step]="getStep(StepType.CONCEPT)" [loading]="loading"
+                        (editStep)="setStep($event)"></app-step-overlay>
+
                     <div class="card-body">
                         <h5 class="card-title fw-bold">Paso 1 — Concepto creativo</h5>
                         <h6 class="card-subtitle mb-3 text-body-secondary">Define los parámetros para la elección del color</h6>
@@ -26,6 +25,7 @@
 
                             <input type="text" id="promptInput" class="form-control"
                                 placeholder="Ej: nostalgia urbana, minimalismo cálido..."
+                                [class.disabled]="loading" [disabled]="loading" [readonly]="loading"
                                 required minlength="1">
                         </div>
 
@@ -36,35 +36,37 @@
                                     (Opcional) Sugerencia de la IA
                                 </label>
 
-                                <button type="button" class="btn btn-outline-primary btn-sm ms-3">
-                                    <span>Generar prompt</span>
-                                    <i class="bi bi-stars ms-1"></i>
-                                </button>
+                                <btn-spinner label="Generar prompt" btnClass="btn btn-outline-primary btn-sm ms-3"
+                                    iconClass="bi bi-stars" iconPosition="end"
+                                    [loading]="loadingPrompt" [disabled]="loading"
+                                    (click)="onClickBtnPrompt()"></btn-spinner>
                             </div>
 
                             <textarea id="aiPrompt" class="form-control" rows="2"
                                 placeholder="Sugerencia generada por la IA..."
-                                disabled readonly
+                                [class.disabled]="loading" [disabled]="loading" [readonly]="loading"
                             ></textarea>
                         </div>
                         
                         <!-- Obtener color base -->
-                        <button type="button" class="btn btn-primary">
-                            <span>Obtener color base</span>
-                            <i class="bi bi-stars ms-1"></i>
-                        </button>
+                        <btn-spinner label="Obtener color base" btnClass="btn btn-primary"
+                            iconClass="bi bi-stars" iconPosition="end"
+                            [loading]="loadingColorBase" [disabled]="loading"
+                            (click)="onClickBtnColorBase()"></btn-spinner>
+
+                        <app-error-alert [error]="errorConcepto"
+                            [alertClass]="'mb-0 mt-3'"></app-error-alert>
                     </div>
                 </div>
 
                 <!-- =================================================================== -->
                 <!-- PASO 2 — Color Base -->
                 <!-- =================================================================== -->
-                <div class="card border-dark mb-4">
-                    <div class="overlay">
-                        <a type="button" class="mt-2">
-                            <i class="bi bi-pencil-square fs-3 px-3 text-gray"></i>
-                        </a>
-                    </div>
+                <div class="card border-dark fade-in mb-4"
+                    [class.show]="!hide(StepType.BASE_COLOR)" [class.hidden]="hide(StepType.BASE_COLOR)">
+                    <app-step-overlay [step]="getStep(StepType.BASE_COLOR)" [loading]="loading"
+                        (editStep)="setStep($event)"></app-step-overlay>
+
                     <div class="card-body">
                         <h5 class="card-title fw-bold">Paso 2 — Color base</h5>
                         <h6 class="card-subtitle mb-4 text-body-secondary">Genera un color base a partir del concepto creativo</h6>
@@ -85,7 +87,8 @@
                                         <label for="hexOutput" class="form-label">Código hexadecimal</label>
 
                                         <input type="text" id="hexOutput" class="form-control"
-                                            value="#FFFFFF" pattern="^#([A-Fa-f0-9]{6})$">
+                                            value="#FFFFFF" pattern="^#([A-Fa-f0-9]{6})$"
+                                            [class.disabled]="loading" [disabled]="loading" [readonly]="loading">
                                     </div>
 
                                     <!-- RGB -->
@@ -93,7 +96,8 @@
                                         <label for="hexOutput" class="form-label">Código RGB</label>
 
                                         <input type="text" id="rgbOutput" class="form-control"
-                                            value="238, 238, 238" pattern="^#([0-9]{6})$">
+                                            value="238, 238, 238" pattern="^#([0-9]{6})$"
+                                            [class.disabled]="loading" [disabled]="loading" [readonly]="loading">
                                     </div>
 
                                     <!-- Color Picker -->
@@ -102,26 +106,36 @@
 
                                         <input type="color" id="colorPicker"
                                             class="form-control form-control-color"
-                                            value="#eeeeee" title="Selecciona un color">
+                                            value="#eeeeee" title="Selecciona un color"
+                                            [class.disabled]="loading" [disabled]="loading">
                                     </div>
                                 </div>
                             </div>
                         </div>
                         
                         <div class="row">
-                            <div class="col-md-8">
-                                <!-- Definir paleta -->
-                                <btn-spinner label="Definir paleta de color" btnClass="btn btn-gray"
-                                    iconClass="bi bi-gear-fill" iconPosition="start"></btn-spinner>
+                            <div class="col-md-12">
+                                <!-- Definir esquema -->
+                                <btn-spinner label="Definir esquema de color" btnClass="btn btn-gray"
+                                    iconClass="bi bi-gear-fill" iconPosition="start"
+                                    [loading]="false" [disabled]="loading"
+                                    (click)="onClickBtnDefinirEsquema()"></btn-spinner>
+                                    
+                                <app-error-alert [error]="errorColorBase"
+                                    [alertClass]="'mb-0 mt-3'"></app-error-alert>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- =================================================================== -->
-                <!-- PASO 3 — Construcción de Paleta -->
+                <!-- PASO 3 — Selección del esquema -->
                 <!-- =================================================================== -->
-                <div class="card border-dark mb-4">
+                <div class="card border-dark fade-in mb-4"
+                    [class.show]="!hide(StepType.SCHEME)" [class.hidden]="hide(StepType.SCHEME)">
+                    <app-step-overlay [step]="getStep(StepType.SCHEME)" [loading]="loading"
+                        (editStep)="setStep($event)"></app-step-overlay>
+                    
                     <div class="card-body">
                         <h5 class="card-title fw-bold">Paso 3 — Construcción cromática</h5>
                         <h6 class="card-subtitle mb-1 text-body-secondary">Selecciona los parámetros de creación de la paleta de color</h6>
@@ -133,7 +147,8 @@
                                     Tipo de esquema cromático
                                 </label>
 
-                                <select id="schemeSelect" class="form-select" required>
+                                <select id="schemeSelect" class="form-select" required
+                                    [class.disabled]="loading" [disabled]="loading">
                                     <option value="" selected disabled>Selecciona un esquema...</option>
                                     <option value="complementary">Complementario</option>
                                     <option value="analogic">Análogo</option>
@@ -148,7 +163,8 @@
                                 <label for="numColors" class="form-label">Número de tonalidades</label>
 
                                 <input type="range" id="numColors" class="form-range"
-                                    min="1" max="10" step="1" value="5">
+                                    min="1" max="10" step="1" value="5"
+                                    [class.disabled]="loading" [disabled]="loading" [readonly]="loading">
 
                                 <div class="d-flex justify-content-between">
                                     <span>1</span>
@@ -160,14 +176,23 @@
 
                         <!-- Generar paleta -->
                         <btn-spinner label="Generar paleta final" btnClass="btn btn-success mt-3"
-                            iconClass="bi bi-stars" iconPosition="end"></btn-spinner>
+                            iconClass="bi bi-stars" iconPosition="end"
+                            [loading]="loadingPaleta" [disabled]="loading"
+                            (click)="onClickBtnGenerarPaleta()"></btn-spinner>
+                            
+                        <app-error-alert [error]="errorEsquema"
+                            [alertClass]="'mb-0 mt-3'"></app-error-alert>
                     </div>
                 </div>
 
                 <!-- =================================================================== -->
                 <!-- PASO 4 — Resultado final -->
                 <!-- =================================================================== -->
-                <div class="card border-dark mb-4">
+                <div class="card border-dark fade-in mb-4"
+                    [class.show]="!hide(StepType.RESULT)" [class.hidden]="hide(StepType.RESULT)">
+                    <app-step-overlay [step]="getStep(StepType.RESULT)" [loading]="loading"
+                        (editStep)="setStep($event)"></app-step-overlay>
+                    
                     <div class="card-body">
                         <h5 class="card-title fw-bold">Paso 4 — Paleta resultante</h5>
                         <h6 class="card-subtitle mb-4 text-body-secondary">Visualiza la paleta cromática generada</h6>
@@ -232,22 +257,34 @@
                                 disabled readonly
                             ></textarea>
                         </div>
+                        
+                        <div class="alert alert-success mt-3 fade show" role="alert">
+                            La paleta se ha <strong>generado</strong> y ha sido <strong>guardada en la biblioteca</strong> correctamente.
+                        </div>
+
+                        <app-error-alert [error]="errorResultado"
+                            [alertClass]="'mb-0 mt-3'"></app-error-alert>
                     </div>
                 </div>
 
                 <!-- =================================================================== -->
                 <!-- REINICIAR COMPOSICIÓN
                 <!-- =================================================================== -->
-                <div class="text-end">
-                    <button class="btn btn-outline-dark mb-2" routerLink="/library">
-                        <i class="bi bi-journals me-2"></i>
-                        <span class="px-2">Explorar biblioteca</span>
-                    </button>
-                    <button class="btn btn-outline-danger mb-2 ms-3" data-bs-toggle="modal" data-bs-target="#modalReinicio">
-                        <i class="bi bi-arrow-clockwise me-2"></i>
-                        <span>Reiniciar composición</span>
-                    </button>
-                </div>
+                 @if (!initiated(StepType.RESULT)) {
+                    <div class="text-end">
+                        <button class="btn btn-outline-dark mb-2" routerLink="/library"
+                            [class.disabled]="loading" [disabled]="loading">
+                            <i class="bi bi-journals me-2"></i>
+                            <span class="px-2">Explorar biblioteca</span>
+                        </button>
+                        <button class="btn btn-outline-danger mb-2 ms-3"
+                            [class.disabled]="loading" [disabled]="loading"
+                            data-bs-toggle="modal" data-bs-target="#modalReinicio">
+                            <i class="bi bi-arrow-clockwise me-2"></i>
+                            <span>Reiniciar composición</span>
+                        </button>
+                    </div>
+                }
 
                 <div class="modal" tabindex="-1" id="modalReinicio">
                     <div class="modal-dialog">
@@ -264,7 +301,7 @@
                                 <i class="bi bi-x-lg me-2"></i>
                                 <span>Cerrar</span>
                             </button>
-                            <button type="button" class="btn btn-danger">
+                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal" (click)="restart()">
                                 <i class="bi bi-trash me-2"></i>
                                 <span>Reiniciar</span>
                             </button>
