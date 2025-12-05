@@ -117,7 +117,7 @@
                                 <!-- Definir esquema -->
                                 <btn-spinner label="Definir esquema de color" btnClass="btn btn-gray"
                                     iconClass="bi bi-gear-fill" iconPosition="start"
-                                    [loading]="false" [disabled]="loading"
+                                    [loading]="loadingEsquema" [disabled]="loading"
                                     (click)="onClickBtnDefinirEsquema()"></btn-spinner>
                                     
                                 <app-error-alert [error]="baseColorStep.error" [alertClass]="'mb-0 mt-3'"></app-error-alert>

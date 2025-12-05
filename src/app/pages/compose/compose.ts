@@ -6,12 +6,12 @@ import { TheColorAPIService } from '../../services/the-color-api';
 import { StepOverlay } from '../../components/step-overlay/step-overlay';
 import { BtnSpinner } from '../../components/btn-spinner/btn-spinner';
 import { ErrorAlert } from '../../components/error-alert/error-alert';
-import { of } from 'rxjs';
-import { delay, finalize } from 'rxjs/operators';
+import { delay, finalize, shareReplay } from 'rxjs/operators';
 import { Concept } from '../../model/colors/Concept';
 import { Color } from '../../model/colors/Color';
 import { ColorScheme } from '../../model/colors/ColorScheme';
 import { ColorPalette } from '../../model/colors/ColorPalette';
+import { of, OperatorFunction } from 'rxjs';
 
 @Component({
   selector: 'app-compose',
@@ -34,80 +34,79 @@ export class Compose {
   loading: boolean = false;
   loadingPrompt: boolean = false;
   loadingColorBase: boolean = false;
+  loadingEsquema: boolean = false;
   loadingPaleta: boolean = false;
 
 
   onClickBtnPrompt() {
+    this.loading = true
     this.loadingPrompt = true;
     this.conceptStep.error = null;
 
-    this.delayedOperation(
-      2000,
-      (value: string) => {
-      },
-      (err) => this.conceptStep.error = err,
-      () => this.loadingPrompt = false);
+    this.geminiService.getSuggestionPrompt(this.conceptStep.data.context)
+      .pipe(this.onFinalize(l => (this.loadingPrompt = l)))
+      .subscribe({
+        next: (value: string) => {
+          this.conceptStep.data.suggestion = value;
+        },
+        error: (err) => this.conceptStep.error = err
+      });
   }
 
   onClickBtnColorBase() {
+    this.loading = true
     this.loadingColorBase = true;
     this.conceptStep.error = null;
 
-    this.delayedOperation(
-      2000,
-      (value: string) => {
-        this.setStep(this.baseColorStep);
-      },
-      (err) => this.conceptStep.error = err,
-      () => this.loadingColorBase = false);
+    this.text2ColorService.text2Color(this.conceptStep.data)
+      .pipe(this.onFinalize(l => (this.loadingColorBase = l)))
+      .subscribe({
+        next: (value: Color) => {
+          this.baseColorStep.data = value;
+          this.setStep(this.baseColorStep);
+        },
+        error: (err) => this.conceptStep.error = err
+      });
   }
   
   onClickBtnDefinirEsquema() {
+    this.loading = true
+    this.loadingEsquema = true;
     this.baseColorStep.error = null;
 
-    this.delayedOperation(
-      1,
-      (value: string) => {
-        this.setStep(this.schemeStep);
-      },
-      (err) => this.baseColorStep.error = err,
-      () => {});
+    of("")
+      .pipe(delay(1000))
+      .pipe(shareReplay(1))
+      .pipe(this.onFinalize(l => (this.loadingEsquema = l)))
+      .subscribe({
+        next: (value: string) => {
+          this.setStep(this.schemeStep);
+        },
+        error: (err) => this.baseColorStep.error = err
+      });
   }
   
   onClickBtnGenerarPaleta() {
+    this.loading = true
     this.loadingPaleta = true;
     this.schemeStep.error = null;
 
-    this.delayedOperation(
-      2000,
-      (value: string) => {
-        this.setStep(this.resultStep);
-      },
-      (err) => this.schemeStep.error = err,
-      () => this.loadingPaleta = false);
+    this.theColorAPIService.getColorPalette(this.baseColorStep.data, this.schemeStep.data)
+      .pipe(this.onFinalize(l => (this.loadingPaleta = l)))
+      .subscribe({
+        next: (value: ColorPalette) => {
+          this.resultStep.data = value;
+          this.setStep(this.resultStep);
+        },
+        error: (err) => this.schemeStep.error = err
+      });
   }
 
-  private delayedOperation(ms: number,
-      operation: (value: string) => void,
-      error: (err: any) => void,
-      end: () => void) {
-
-    this.loading = true
-
-    of("").pipe(
-      delay(ms),
-      finalize(() => {
-        end();
-        this.loading = false;
-        this.cdr.detectChanges();
-      })
-    ).subscribe({
-      next: (value: string) => {
-        operation(value);
-      },
-      error: (err) => {
-        error(err);
-      }
+  private onFinalize(loaderSetter: (v: boolean) => void): OperatorFunction<any, any> {
+    return finalize(() => {
+      loaderSetter(false);
+      this.loading = false;
+      this.cdr.detectChanges();
     });
   }
 

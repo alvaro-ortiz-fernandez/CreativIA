@@ -16,5 +16,9 @@ export class Library {
   SpinnerSize = SpinnerSize; // Exponer el enum al template
 
   private firebaseService: FirebaseService = inject(FirebaseService);
-  colorPalettes: Observable<ColorPalette[]> = this.firebaseService.getColorPalettes();
+  colorPalettes!: Observable<ColorPalette[]>;
+
+  constructor() {
+    this.colorPalettes = this.firebaseService.getColorPalettes();
+  }
 }
