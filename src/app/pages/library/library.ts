@@ -3,6 +3,7 @@ import { AsyncPipe } from '@angular/common';
 import { FirebaseService } from '../../services/firebase';
 import { Observable } from 'rxjs';
 import { Spinner, SpinnerSize } from '../../components/spinner/spinner';
+import { ColorPalette } from '../../model/colors/ColorPalette';
 
 @Component({
   selector: 'app-library',

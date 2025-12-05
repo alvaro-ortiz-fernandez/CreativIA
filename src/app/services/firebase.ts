@@ -22,10 +22,21 @@ export class FirebaseService {
     const colorPalettes: ColorPalette[] = [
       {
         id: "1",
-        baseColor: '#CCCCCC',
-        scheme: "Tetrádico",
-        description: "Esquema de color seco.",
-        context: "A emplear en la creación de combinaciones vibrantes.",
+        baseColor: {
+          name: "Azul profundo",
+          hex: "#CCCCCC",
+          r: 204,
+          g: 204,
+          b: 204
+        },
+        scheme: {
+          type: "Tetrádico",
+          tones: 4
+        },
+        concept: {
+          context: "Esquema de color seco.",
+          suggestion: "A emplear en la creación de combinaciones vibrantes."
+        },
         interpretation: "El color gris suave transmite neutralidad y equilibrio, proporcionando una base versátil que puede complementar una amplia gama de colores.",
         colors: [
           { name: "Gris suave", hex: "#CCCCCC", r: 204, g: 204, b: 204 },

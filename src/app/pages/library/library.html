@@ -20,18 +20,20 @@
                         <div class="row mb-3 align-items-center gx-5">
                             <div class="col-lg-4 text-center text-lg-start mb-4 mb-lg-0">
                                 <div class="bg-light p-4 rounded-4">
-                                    <div class="fw-bolder" [style.color]="colorPalette.baseColor">{{ colorPalette.baseColor }}</div>
+                                    <div class="fw-bolder" [style.color]="colorPalette.baseColor.hex">{{ colorPalette.baseColor.hex }}</div>
                                     <div class="small fst-italic text-muted">Color base</div>
-                                    <div class="small fw-bolder mt-2">{{ colorPalette.scheme }}</div>
+                                    <div class="small fw-bolder mt-2">{{ colorPalette.scheme.type }}</div>
                                     <div class="small fst-italic text-muted">Esquema cromático</div>
                                 </div>
                             </div>
                             <div class="col-lg-8">
-                                <div class="fw-bolder">{{ colorPalette.description }}</div>
+                                <div class="fw-bolder">{{ colorPalette.concept.context }}</div>
+                                @if (colorPalette.concept.suggestion) {
                                 <div class="small text-muted fst-italic">
                                     <i class="bi bi-stars me-1"></i>
-                                    <span>{{ colorPalette.context }}</span>
+                                    <span>{{ colorPalette.concept.suggestion }}</span>
                                 </div>
+                                }
                                 <div class="mt-2">{{ colorPalette.interpretation }}</div>
                             </div>
                         </div>

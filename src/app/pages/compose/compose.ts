@@ -8,6 +8,10 @@ import { BtnSpinner } from '../../components/btn-spinner/btn-spinner';
 import { ErrorAlert } from '../../components/error-alert/error-alert';
 import { of } from 'rxjs';
 import { delay, finalize } from 'rxjs/operators';
+import { Concept } from '../../model/colors/Concept';
+import { Color } from '../../model/colors/Color';
+import { ColorScheme } from '../../model/colors/ColorScheme';
+import { ColorPalette } from '../../model/colors/ColorPalette';
 
 @Component({
   selector: 'app-compose',
@@ -17,73 +21,77 @@ import { delay, finalize } from 'rxjs/operators';
 })
 export class Compose {
 
-  // Exponer el enum al template
-  StepType = StepType;
-
   geminiService: GeminiService = inject(GeminiService);
   text2ColorService: Text2ColorService = inject(Text2ColorService);
   theColorAPIService: TheColorAPIService = inject(TheColorAPIService);
   cdr = inject(ChangeDetectorRef);
 
-  steps: Step[] = this.getInitSteps();
+  conceptStep: Step<Concept> = this.initConceptStep();
+  baseColorStep: Step<Color> = this.initBaseColorStep();
+  schemeStep: Step<ColorScheme> = this.initSchemeStep();
+  resultStep: Step<ColorPalette> = this.initResultStep();
 
   loading: boolean = false;
   loadingPrompt: boolean = false;
   loadingColorBase: boolean = false;
   loadingPaleta: boolean = false;
 
-  errorConcepto?: any = null;
-  errorColorBase?: any = null;
-  errorEsquema?: any = null;
-  errorResultado?: any = null;
-
 
   onClickBtnPrompt() {
     this.loadingPrompt = true;
+    this.conceptStep.error = null;
 
     this.delayedOperation(
       2000,
       (value: string) => {
-        this.errorConcepto = null;
       },
+      (err) => this.conceptStep.error = err,
       () => this.loadingPrompt = false);
   }
 
   onClickBtnColorBase() {
     this.loadingColorBase = true;
+    this.conceptStep.error = null;
 
     this.delayedOperation(
       2000,
       (value: string) => {
-        this.setStep(StepType.BASE_COLOR);
-        this.errorConcepto = null;
+        this.setStep(this.baseColorStep);
       },
+      (err) => this.conceptStep.error = err,
       () => this.loadingColorBase = false);
   }
   
   onClickBtnDefinirEsquema() {
+    this.baseColorStep.error = null;
+
     this.delayedOperation(
       1,
       (value: string) => {
-        this.setStep(StepType.SCHEME);
-        this.errorColorBase = null;
+        this.setStep(this.schemeStep);
       },
+      (err) => this.baseColorStep.error = err,
       () => {});
   }
   
   onClickBtnGenerarPaleta() {
     this.loadingPaleta = true;
+    this.schemeStep.error = null;
 
     this.delayedOperation(
       2000,
       (value: string) => {
-        this.setStep(StepType.RESULT);
-        this.errorEsquema = null;
+        this.setStep(this.resultStep);
       },
+      (err) => this.schemeStep.error = err,
       () => this.loadingPaleta = false);
   }
 
-  private delayedOperation(ms: number, operation: (value: string) => void, end: () => void) {
+  private delayedOperation(ms: number,
+      operation: (value: string) => void,
+      error: (err: any) => void,
+      end: () => void) {
+
     this.loading = true
 
     of("").pipe(
@@ -98,82 +106,90 @@ export class Compose {
         operation(value);
       },
       error: (err) => {
-        console.error(err);
+        error(err);
       }
     });
   }
 
   restart() {
-    this.steps = this.getInitSteps();
+    this.conceptStep = this.initConceptStep();
+    this.baseColorStep = this.initBaseColorStep();
+    this.schemeStep = this.initSchemeStep();
+    this.resultStep = this.initResultStep();
+
     this.loading = false;
   }
 
-  setStep(type: StepType) {
-    const order: StepType[] = [
-      StepType.CONCEPT,
-      StepType.BASE_COLOR,
-      StepType.SCHEME,
-      StepType.RESULT,
+  setStep(step: Step<any>) {
+    const order: Step<any>[] = [
+      this.conceptStep,
+      this.baseColorStep,
+      this.schemeStep,
+      this.resultStep,
     ];
 
-    const currentIndex = order.indexOf(type);
+    const currentIndex = order.indexOf(step);
 
     for (let i = 0; i < order.length; i++) {
-      const step = this.getStep(order[i]);
+      const step = order[i];
 
       if (step) {
         if (i < currentIndex - 1) {
           step.status = StepStatus.COMPLETED;
-        } 
-        else if (i === currentIndex - 1) {
+
+        } else if (i === currentIndex - 1) {
           step.status = StepStatus.EDITABLE;
-        } 
-        else if (i === currentIndex) {
+
+        } else if (i === currentIndex) {
           step.status = StepStatus.ENABLED;
           step.initiated = true;
-        } 
-        else {
+
+        } else {
           step.status = StepStatus.DISABLED;
         }
       }
     }
-
-    this.steps = [...this.steps];
   }
 
-  getStep(type: StepType): Step | undefined {
-    return this.steps.find(s => s.type === type);
+  hide(step: Step<any>): boolean {
+    return this.initiated(step);
   }
 
-  hide(type: StepType): boolean {
-    return this.initiated(type);
+  initiated(step: Step<any>): boolean {
+    return step?.initiated !== true;
   }
 
-  initiated(type: StepType): boolean {
-    return this.getStep(type)?.initiated !== true;
+  private initConceptStep(): Step<Concept> {
+    return new Step(new Concept(), StepStatus.ENABLED, true);
   }
 
-  private getInitSteps(): Step[] {
-    return [
-      { type: StepType.CONCEPT, status: StepStatus.ENABLED, initiated: true },
-      { type: StepType.BASE_COLOR, status: StepStatus.DISABLED, initiated: false },
-      { type: StepType.SCHEME, status: StepStatus.DISABLED, initiated: false },
-      { type: StepType.RESULT, status: StepStatus.DISABLED, initiated: false }
-    ]
+  private initBaseColorStep(): Step<Color> {
+    return new Step(new Color(), StepStatus.DISABLED, false);
+  }
+
+  private initSchemeStep(): Step<ColorScheme> {
+    return new Step(new ColorScheme(), StepStatus.DISABLED, false);
+  }
+
+  private initResultStep(): Step<ColorPalette> {
+    return new Step(new ColorPalette(), StepStatus.DISABLED, false);
   }
 }
 
-export interface Step {
-  type: StepType;
+export class Step<T> {
+  data: T;
   status: StepStatus;
   initiated: boolean;
-}
+  error?: any;
 
-export enum StepType {
-  CONCEPT = 'CONCEPT',
-  BASE_COLOR = 'BASE-COLOR',
-  SCHEME = 'SCHEME',
-  RESULT = 'RESULT'
+  constructor(data: T, status: StepStatus = StepStatus.DISABLED,
+      initiated: boolean = false, error: any = undefined) {
+
+    this.data = data;
+    this.status = status;
+    this.initiated = initiated;
+    this.error = error;
+  }
 }
 
 export enum StepStatus {

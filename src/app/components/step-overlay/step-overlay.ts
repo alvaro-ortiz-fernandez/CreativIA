@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { Step, StepType, StepStatus } from '../../pages/compose/compose';
+import { Step, StepStatus } from '../../pages/compose/compose';
 
 @Component({
   selector: 'app-step-overlay',
@@ -9,13 +9,13 @@ import { Step, StepType, StepStatus } from '../../pages/compose/compose';
 })
 export class StepOverlay {
   
-  @Input() step: Step | undefined;
+  @Input() step: Step<any> | undefined;
   @Input() loading: boolean = false;
-  @Output() editStep = new EventEmitter<StepType>();
+  @Output() editStep = new EventEmitter<Step<any>>();
 
   edit() {
     if (this.isEditable() && this.step && this.loading !== true)
-      this.editStep.emit(this.step.type);
+      this.editStep.emit(this.step);
   }
 
   isActionable(): boolean {

@@ -11,8 +11,8 @@
                 <!-- PASO 1 — Concepto / Prompt -->
                 <!-- =================================================================== -->
                 <div class="card border-dark fade-in mb-4"
-                    [class.show]="!hide(StepType.CONCEPT)" [class.hidden]="hide(StepType.CONCEPT)">
-                    <app-step-overlay [step]="getStep(StepType.CONCEPT)" [loading]="loading"
+                    [class.show]="!hide(conceptStep)" [class.hidden]="hide(conceptStep)">
+                    <app-step-overlay [step]="conceptStep" [loading]="loading"
                         (editStep)="setStep($event)"></app-step-overlay>
 
                     <div class="card-body">
@@ -54,8 +54,7 @@
                             [loading]="loadingColorBase" [disabled]="loading"
                             (click)="onClickBtnColorBase()"></btn-spinner>
 
-                        <app-error-alert [error]="errorConcepto"
-                            [alertClass]="'mb-0 mt-3'"></app-error-alert>
+                        <app-error-alert [error]="conceptStep.error" [alertClass]="'mb-0 mt-3'"></app-error-alert>
                     </div>
                 </div>
 
@@ -63,8 +62,8 @@
                 <!-- PASO 2 — Color Base -->
                 <!-- =================================================================== -->
                 <div class="card border-dark fade-in mb-4"
-                    [class.show]="!hide(StepType.BASE_COLOR)" [class.hidden]="hide(StepType.BASE_COLOR)">
-                    <app-step-overlay [step]="getStep(StepType.BASE_COLOR)" [loading]="loading"
+                    [class.show]="!hide(baseColorStep)" [class.hidden]="hide(baseColorStep)">
+                    <app-step-overlay [step]="baseColorStep" [loading]="loading"
                         (editStep)="setStep($event)"></app-step-overlay>
 
                     <div class="card-body">
@@ -121,8 +120,7 @@
                                     [loading]="false" [disabled]="loading"
                                     (click)="onClickBtnDefinirEsquema()"></btn-spinner>
                                     
-                                <app-error-alert [error]="errorColorBase"
-                                    [alertClass]="'mb-0 mt-3'"></app-error-alert>
+                                <app-error-alert [error]="baseColorStep.error" [alertClass]="'mb-0 mt-3'"></app-error-alert>
                             </div>
                         </div>
                     </div>
@@ -132,8 +130,8 @@
                 <!-- PASO 3 — Selección del esquema -->
                 <!-- =================================================================== -->
                 <div class="card border-dark fade-in mb-4"
-                    [class.show]="!hide(StepType.SCHEME)" [class.hidden]="hide(StepType.SCHEME)">
-                    <app-step-overlay [step]="getStep(StepType.SCHEME)" [loading]="loading"
+                    [class.show]="!hide(schemeStep)" [class.hidden]="hide(schemeStep)">
+                    <app-step-overlay [step]="schemeStep" [loading]="loading"
                         (editStep)="setStep($event)"></app-step-overlay>
                     
                     <div class="card-body">
@@ -180,8 +178,7 @@
                             [loading]="loadingPaleta" [disabled]="loading"
                             (click)="onClickBtnGenerarPaleta()"></btn-spinner>
                             
-                        <app-error-alert [error]="errorEsquema"
-                            [alertClass]="'mb-0 mt-3'"></app-error-alert>
+                        <app-error-alert [error]="schemeStep.error" [alertClass]="'mb-0 mt-3'"></app-error-alert>
                     </div>
                 </div>
 
@@ -189,8 +186,8 @@
                 <!-- PASO 4 — Resultado final -->
                 <!-- =================================================================== -->
                 <div class="card border-dark fade-in mb-4"
-                    [class.show]="!hide(StepType.RESULT)" [class.hidden]="hide(StepType.RESULT)">
-                    <app-step-overlay [step]="getStep(StepType.RESULT)" [loading]="loading"
+                    [class.show]="!hide(resultStep)" [class.hidden]="hide(resultStep)">
+                    <app-step-overlay [step]="resultStep" [loading]="loading"
                         (editStep)="setStep($event)"></app-step-overlay>
                     
                     <div class="card-body">
@@ -258,19 +255,18 @@
                             ></textarea>
                         </div>
                         
-                        <div class="alert alert-success mt-3 fade show" role="alert">
+                        <div class="alert alert-success mt-3 mb-0 fade show" role="alert">
                             La paleta se ha <strong>generado</strong> y ha sido <strong>guardada en la biblioteca</strong> correctamente.
                         </div>
 
-                        <app-error-alert [error]="errorResultado"
-                            [alertClass]="'mb-0 mt-3'"></app-error-alert>
+                        <app-error-alert [error]="resultStep.error" [alertClass]="'mb-0 mt-3'"></app-error-alert>
                     </div>
                 </div>
 
                 <!-- =================================================================== -->
                 <!-- REINICIAR COMPOSICIÓN
                 <!-- =================================================================== -->
-                 @if (!initiated(StepType.RESULT)) {
+                 @if (!initiated(resultStep)) {
                     <div class="text-end">
                         <button class="btn btn-outline-dark mb-2" routerLink="/library"
                             [class.disabled]="loading" [disabled]="loading">
