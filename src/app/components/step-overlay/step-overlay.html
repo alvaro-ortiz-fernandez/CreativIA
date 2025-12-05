@@ -1,11 +1,11 @@
-@if (!isEnabled()) {
+@if (step?.isEnabled() !== true) {
 <div class="overlay">
     <a type="button"  (click)="edit()"
-        [class.mt-2]="isEditable()"
+        [class.mt-2]="step?.isEditable() === true"
         [class.cursor-default]="!isActionable()">
-        @if (isEditable()) {
+        @if (step?.isEditable() === true) {
         <i class="bi bi-pencil-square fs-3 px-3 text-gray"></i>
-        } @else if (isCompleted()) {
+        } @else if (step?.isCompleted() === true) {
         <i class="bi bi-check fs-1 px-2 text-success"></i>
         }
     </a>

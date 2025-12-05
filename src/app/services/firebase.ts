@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { delay, shareReplay } from 'rxjs/operators';
 import { ColorPalette } from '../model/colors/ColorPalette';
+import { Color } from '../model/colors/Color';
 
 @Injectable({
   providedIn: 'root',
@@ -11,13 +12,7 @@ export class FirebaseService {
   mockColorPalettes: ColorPalette[] = [
     {
       id: "1",
-      baseColor: {
-        name: "Azul profundo",
-        hex: "#CCCCCC",
-        r: 204,
-        g: 204,
-        b: 204
-      },
+      baseColor: new Color("Azul profundo", "#CCCCCC", 204, 204, 204),
       scheme: {
         type: "Tetrádico",
         tones: 4
@@ -28,10 +23,10 @@ export class FirebaseService {
       },
       interpretation: "El color gris suave transmite neutralidad y equilibrio, proporcionando una base versátil que puede complementar una amplia gama de colores.",
       colors: [
-        { name: "Gris suave", hex: "#CCCCCC", r: 204, g: 204, b: 204 },
-        { name: "Azul cielo", hex: "#99CCFF", r: 153, g: 204, b: 255 },
-        { name: "Naranja cálido", hex: "#FFCC99", r: 255, g: 204, b: 153 },
-        { name: "Verde menta", hex: "#99FFCC", r: 153, g: 255, b: 204 }
+        new Color("Gris suave", "#CCCCCC", 204, 204, 204),
+        new Color("Azul cielo", "#99CCFF", 153, 204, 255),
+        new Color("Naranja cálido", "#FFCC99", 255, 204, 153),
+        new Color("Verde menta", "#99FFCC", 153, 255, 204)
       ]
     }
   ];
@@ -43,5 +38,11 @@ export class FirebaseService {
 
   getColorPalettes(): Observable<ColorPalette[]> {
     return this.colorPalettes$;
+  }
+
+  saveColorPalette(colorPalette: ColorPalette): Observable<ColorPalette> {
+    return of(colorPalette)
+        .pipe(delay(100))
+        .pipe(shareReplay(1));
   }
 }

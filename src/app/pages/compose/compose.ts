@@ -1,18 +1,21 @@
 import { Component, ChangeDetectorRef, inject } from '@angular/core';
-import { FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { GeminiService } from '../../services/gemini';
-import { Text2ColorService } from '../../services/text2-color';
-import { TheColorAPIService } from '../../services/the-color-api';
+import { GeminiService, GeminiServiceHttp, GeminiServiceMock } from '../../services/gemini';
+import { Text2ColorService, Text2ColorServiceHttp, Text2ColorServiceMock } from '../../services/text2-color';
+import { TheColorAPIService, TheColorAPIServiceHttp,
+  TheColorAPIServiceMock } from '../../services/the-color-api';
 import { StepOverlay } from '../../components/step-overlay/step-overlay';
 import { BtnSpinner } from '../../components/btn-spinner/btn-spinner';
 import { ErrorAlert } from '../../components/error-alert/error-alert';
-import { delay, finalize, shareReplay } from 'rxjs/operators';
+import { delay, finalize, map, shareReplay, switchMap } from 'rxjs/operators';
 import { Concept } from '../../model/colors/Concept';
 import { Color } from '../../model/colors/Color';
 import { ColorScheme } from '../../model/colors/ColorScheme';
 import { ColorPalette } from '../../model/colors/ColorPalette';
 import { of, OperatorFunction } from 'rxjs';
+import { Step, StepStatus } from '../../components/step-overlay/Step';
+import { FirebaseService } from '../../services/firebase';
 
 @Component({
   selector: 'app-compose',
@@ -26,10 +29,16 @@ import { of, OperatorFunction } from 'rxjs';
 export class Compose {
 
   // Servicios
-  geminiService: GeminiService = inject(GeminiService);
-  text2ColorService: Text2ColorService = inject(Text2ColorService);
-  theColorAPIService: TheColorAPIService = inject(TheColorAPIService);
-  cdr = inject(ChangeDetectorRef);
+  private geminiServiceHttp: GeminiServiceHttp = inject(GeminiServiceHttp);
+  private geminiServiceMock: GeminiServiceMock = inject(GeminiServiceMock);
+  private text2ColorServiceHttp: Text2ColorServiceHttp = inject(Text2ColorServiceHttp);
+  private text2ColorServiceMock: Text2ColorServiceMock = inject(Text2ColorServiceMock);
+  private theColorAPIServiceHttp: TheColorAPIServiceHttp = inject(TheColorAPIServiceHttp);
+  private theColorAPIServiceMock: TheColorAPIServiceMock = inject(TheColorAPIServiceMock);
+  private firebaseService: FirebaseService = inject(FirebaseService);
+  private cdr = inject(ChangeDetectorRef);
+  
+  disableMock = true;
 
   // Pasos del formulario
   conceptStep: Step<Concept> = this.initConceptStep();
@@ -44,15 +53,12 @@ export class Compose {
   loadingEsquema: boolean = false;
   loadingPaleta: boolean = false;
 
-  constructor() { console.log(this.baseColorStep.data) }
-
-
   onClickBtnPrompt() {
-    this.setLoading(true);
+    this.loading = true;
     this.loadingPrompt = true;
     this.conceptStep.error = null;
 
-    this.geminiService.getSuggestionPrompt(this.conceptStep.data.context)
+    this.getGeminiService().getSuggestionPrompt(this.conceptStep.data.context)
       .pipe(this.onFinalize(l => (this.loadingPrompt = l)))
       .subscribe({
         next: (value: string) => {
@@ -63,11 +69,11 @@ export class Compose {
   }
 
   onClickBtnColorBase() {
-    this.setLoading(true);
+    this.loading = true;
     this.loadingColorBase = true;
     this.conceptStep.error = null;
 
-    this.text2ColorService.text2Color(this.conceptStep.data)
+    this.getText2ColorService().text2Color(this.conceptStep.data)
       .pipe(this.onFinalize(l => (this.loadingColorBase = l)))
       .subscribe({
         next: (value: Color) => {
@@ -79,7 +85,7 @@ export class Compose {
   }
   
   onClickBtnDefinirEsquema() {
-    this.setLoading(true);
+    this.loading = true;
     this.loadingEsquema = true;
     this.baseColorStep.error = null;
 
@@ -96,51 +102,52 @@ export class Compose {
   }
   
   onClickBtnGenerarPaleta() {
-    this.setLoading(true);
+    this.loading = true;
     this.loadingPaleta = true;
     this.schemeStep.error = null;
 
-    this.theColorAPIService.getColorPalette(this.baseColorStep.data, this.schemeStep.data)
-      .pipe(this.onFinalize(l => (this.loadingPaleta = l)))
-      .subscribe({
-        next: (value: ColorPalette) => {
-          this.resultStep.data = value;
-          this.setStep(this.resultStep);
-        },
-        error: (err) => this.schemeStep.error = err
-      });
+  this.getTheColorAPIService()
+    .getColorPalette(this.baseColorStep.data, this.schemeStep.data, this.conceptStep.data)
+    .pipe(
+      switchMap((palette: ColorPalette) => {
+        this.resultStep.data = palette;
+
+        return this.getGeminiService().getInterpretation(palette)
+        .pipe(
+          map((interpretation: string) => {
+            this.resultStep.data.interpretation = interpretation;
+            return this.resultStep.data; // seguimos pasando ColorPalette
+          })
+        );
+      }),
+      switchMap((colorPalette: ColorPalette) => {
+        return this.firebaseService.saveColorPalette(colorPalette);
+      }),
+      this.onFinalize(l => (this.loadingPaleta = l))
+    )
+    .subscribe({
+      next: (savedPalette: ColorPalette) => {
+        this.resultStep.data = savedPalette;
+        this.setStep(this.resultStep);
+      },
+      error: (err) => this.schemeStep.error = err
+    });
   }
 
   private onFinalize(loaderSetter: (v: boolean) => void): OperatorFunction<any, any> {
     return finalize(() => {
       loaderSetter(false);
-      this.setLoading(false);
+      this.loading = false;
       this.cdr.detectChanges();
     });
   }
 
   syncColorFromHEX() {
-    const hex = this.baseColorStep.data?.hex?.replace('#', '');
-
-    if (hex) {
-      this.baseColorStep.data.r = parseInt(hex.substring(0, 2), 16);
-      this.baseColorStep.data.g = parseInt(hex.substring(2, 4), 16);
-      this.baseColorStep.data.b = parseInt(hex.substring(4, 6), 16);
-    }
+    this.baseColorStep.data?.syncColorFromHEX();
   }
 
   syncColorFromRGB() {
-    const { r, g, b } = this.baseColorStep.data;
-
-    if ([r, g, b].some(v => v < 0 || v > 255 || v == null))
-      return;
-
-    this.baseColorStep.data.hex = (
-        '#' +
-        [r, g, b]
-          .map(v => v.toString(16).padStart(2, '0'))
-          .join('')
-      ).toUpperCase();
+    this.baseColorStep.data?.syncColorFromRGB();
   }
 
   restart() {
@@ -149,7 +156,7 @@ export class Compose {
     this.schemeStep = this.initSchemeStep();
     this.resultStep = this.initResultStep();
 
-    this.setLoading(false);
+    this.loading = false;
   }
 
   setStep(step: Step<any>) {
@@ -207,30 +214,21 @@ export class Compose {
     return new Step(new ColorPalette(), StepStatus.DISABLED, false);
   }
 
-  private setLoading(value: boolean) {
-    this.loading = value;
+  private getGeminiService(): GeminiService {
+    return this.disableMock
+        ? this.geminiServiceHttp
+        : this.geminiServiceMock;
   }
-}
 
-export class Step<T> {
-  data: T;
-  status: StepStatus;
-  initiated: boolean;
-  error?: any;
-
-  constructor(data: T, status: StepStatus = StepStatus.DISABLED,
-      initiated: boolean = false, error: any = undefined) {
-
-    this.data = data;
-    this.status = status;
-    this.initiated = initiated;
-    this.error = error;
+  private getText2ColorService(): Text2ColorService {
+    return this.disableMock
+        ? this.text2ColorServiceHttp
+        : this.text2ColorServiceMock;
   }
-}
 
-export enum StepStatus {
-  DISABLED = 'DISABLED',
-  ENABLED = 'ENABLED',
-  EDITABLE = 'EDITABLE',
-  COMPLETED = 'COMPLETED'
+  private getTheColorAPIService(): TheColorAPIService {
+    return this.disableMock
+        ? this.theColorAPIServiceHttp
+        : this.theColorAPIServiceMock;
+  }
 }

@@ -1,12 +1,35 @@
 <section class="row gx-5 justify-content-center">
     <article class="col-lg-11 col-xl-9 col-xxl-8">
-        <div class="text-center mb-5">
+        <div class="text-center">
             <h1 class="display-5 fw-bolder mb-0"><span class="text-gradient d-inline">Crear paleta de colores</span></h1>
             <p class="lead fw-light mt-3">Sigue los pasos del asistente para generar una gama cromática a través de la inteligencia artificial.</p>
         </div>
 
         <div class="row gx-5 justify-content-center">
             <div class="col-lg-10 col-xl-10">
+                <!-- Des/activar APIs -->
+                <div class="mb-4 pb-4">
+                    <div class="d-flex justify-content-center align-items-center gap-3 mt-3">
+                        <p class="fw-light small mb-0">APIs externas</p>
+
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" id="disableMock" type="checkbox"
+                                [(ngModel)]="disableMock" [class.disabled]="loading" [disabled]="loading">
+                            <label class="form-check-label" for="disableMock">{{ disableMock ? 'Activadas' : 'Desactivadas' }}</label>
+                        </div>
+                    </div>
+
+                    <div class="card border-primary bg-primary-soft mt-2">
+                        <div class="card-body py-2 text-center small">
+                            <p class="text-primary mb-2">
+                                <i class="bi bi-info-circle me-2 text-primary"></i>
+                                <span>¿Por qué desactivar APIs?</span>
+                            </p>
+                            <p class="mb-0">Al desactivar las APIs externas se utilizarán <strong>datos simulados</strong>, evitando así el <strong>consumo de recursos</strong>.</p>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- =================================================================== -->
                 <!-- PASO 1 — Concepto / Prompt -->
                 <!-- =================================================================== -->
@@ -163,11 +186,14 @@
                                         [(ngModel)]="schemeStep.data.type"
                                         [class.disabled]="loading" [disabled]="loading">
                                     <option value="" selected disabled>Selecciona un esquema...</option>
-                                    <option value="complementary">Complementario</option>
-                                    <option value="analogic">Análogo</option>
-                                    <option value="triad">Triádico</option>
                                     <option value="monochrome">Monocromático</option>
-                                    <option value="tetrad">Tetrádico</option>
+                                    <option value="monochrome-dark">Monocromático oscuro</option>
+                                    <option value="monochrome-light">Monocromático claro</option>
+                                    <option value="analogic">Análogo</option>
+                                    <option value="complement">Complementario</option>
+                                    <option value="analogic-complement">Análogo complementario</option>
+                                    <option value="triad">Triada</option>
+                                    <option value="tetrad">Cuádruple</option>
                                 </select>
                             </div>
 
@@ -212,51 +238,18 @@
 
                         <div class="row row-cols-2 row-cols-md-5 g-3 mb-4">
                             <!-- Swatch de colores resultante -->
+                             @for (color of resultStep.data.colors; track color.hex) {
                             <div class="col">
                                 <div class="bg-light rounded-3 text-center">
-                                    <div style="background:#cccccc; height:100px;" class="rounded-top"></div>
+                                    <div style="height:100px;" class="rounded-top"
+                                        [style.background]="color.hex"></div>
                                     <div class="p-2">
-                                        <div class="small fw-bolder">#CCCCCC</div>
-                                        <div class="small text-muted">Gris suave</div>
+                                        <div class="small fw-bolder">{{ color.hex }}</div>
+                                        <div class="small text-muted">{{ color.name }}</div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col">
-                                <div class="bg-light rounded-3 text-center">
-                                    <div style="background:#cccccc; height:100px;" class="rounded-top"></div>
-                                    <div class="p-2">
-                                        <div class="small fw-bolder">#CCCCCC</div>
-                                        <div class="small text-muted">Gris suave</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="bg-light rounded-3 text-center">
-                                    <div style="background:#cccccc; height:100px;" class="rounded-top"></div>
-                                    <div class="p-2">
-                                        <div class="small fw-bolder">#CCCCCC</div>
-                                        <div class="small text-muted">Gris suave</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="bg-light rounded-3 text-center">
-                                    <div style="background:#cccccc; height:100px;" class="rounded-top"></div>
-                                    <div class="p-2">
-                                        <div class="small fw-bolder">#CCCCCC</div>
-                                        <div class="small text-muted">Gris suave</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="bg-light rounded-3 text-center">
-                                    <div style="background:#cccccc; height:100px;" class="rounded-top"></div>
-                                    <div class="p-2">
-                                        <div class="small fw-bolder">#CCCCCC</div>
-                                        <div class="small text-muted">Gris suave</div>
-                                    </div>
-                                </div>
-                            </div>
+                            }
                         </div>
 
                         <!-- Interpretación de la IA -->
@@ -266,12 +259,12 @@
                             </label>
 
                             <textarea id="aiInterpretation" class="form-control" rows="4"
-                                placeholder="Análisis generado por IA..."
-                                disabled readonly
-                            ></textarea>
+                                placeholder="Análisis generado por IA..." disabled readonly
+                            >{{ resultStep.data.interpretation }}</textarea>
                         </div>
                         
-                        <div class="alert alert-success mt-3 mb-0 fade show" role="alert">
+                        <div class="alert alert-success mt-3 mb-0 fade show" role="alert"
+                                [class.d-none]="!resultStep.isEnabled()">
                             La paleta se ha <strong>generado</strong> y ha sido <strong>guardada en la biblioteca</strong> correctamente.
                         </div>
 

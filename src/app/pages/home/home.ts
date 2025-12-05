@@ -43,7 +43,7 @@ export class Home {
     },
     {
       title: 'The Color API',
-      description: 'API de generación de esquemas cromáticos a partir de colores especificados.',
+      description: 'API de generación de esquemas cromáticos a partir de colores determinados.',
       image: 'assets/images/techs/ai.png',
       link: 'https://www.thecolorapi.com/'
     },
