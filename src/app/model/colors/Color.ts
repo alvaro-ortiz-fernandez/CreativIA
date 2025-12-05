@@ -5,8 +5,8 @@ export class Color {
     g: number;
     b: number;
 
-  constructor(name: string = '', hex: string = '',
-        r: number = 0, g: number = 0, b: number = 0) {
+  constructor(name: string = '', hex: string = '#FFFFFF',
+        r: number = 255, g: number = 255, b: number = 255) {
 
     this.name = name;
     this.hex = hex;

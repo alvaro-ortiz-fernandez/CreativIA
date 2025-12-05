@@ -25,8 +25,8 @@
 
                             <input type="text" id="promptInput" class="form-control"
                                 placeholder="Ej: nostalgia urbana, minimalismo cálido..."
-                                [class.disabled]="loading" [disabled]="loading" [readonly]="loading"
-                                required minlength="1">
+                                [(ngModel)]="conceptStep.data.context"
+                                [class.disabled]="loading" [disabled]="loading" [readonly]="loading">
                         </div>
 
                         <!-- IA Prompt -->
@@ -44,6 +44,7 @@
 
                             <textarea id="aiPrompt" class="form-control" rows="2"
                                 placeholder="Sugerencia generada por la IA..."
+                                [(ngModel)]="conceptStep.data.suggestion"
                                 [class.disabled]="loading" [disabled]="loading" [readonly]="loading"
                             ></textarea>
                         </div>
@@ -74,39 +75,52 @@
                             <!-- Swatch -->
                             <div class="col-md-4 text-center">
                                 <div id="colorPreview" class="rounded mb-2 border"
-                                    style="height: 157px; background:#eeeeee;"></div>
+                                    style="height: 157px" [style.background]="baseColorStep.data.hex"></div>
 
                                 <small class="text-muted">Previsualización</small>
                             </div>
 
                             <div class="col-md-8">
-                                <div class="row">
-                                    <!-- HEX -->
-                                    <div class="col-md-6 mb-3">
-                                        <label for="hexOutput" class="form-label">Código hexadecimal</label>
+                                <div class="row mb-1">
+                                    <div class="col-md-8">
+                                        <!-- HEX -->
+                                        <div class="mb-3">
+                                            <label for="hexOutput" class="form-label">Código hexadecimal</label>
 
-                                        <input type="text" id="hexOutput" class="form-control"
-                                            value="#FFFFFF" pattern="^#([A-Fa-f0-9]{6})$"
-                                            [class.disabled]="loading" [disabled]="loading" [readonly]="loading">
+                                            <input type="text" id="hexOutput" class="form-control" pattern="^#([A-Fa-f0-9]{6})$"
+                                                [(ngModel)]="baseColorStep.data.hex" (ngModelChange)="syncColorFromHEX()"
+                                                [class.disabled]="loading" [disabled]="loading" [readonly]="loading">
+                                        </div>
+
+                                        <!-- RGB -->
+                                        <div class="mb-3">
+                                            <label class="form-label">Código RGB</label>
+
+                                            <div class="d-flex gap-2">
+                                                <input type="number" class="form-control" min="0" max="255" placeholder="R"
+                                                    [(ngModel)]="baseColorStep.data.r" (ngModelChange)="syncColorFromRGB()"
+                                                    [class.disabled]="loading" [disabled]="loading" [readonly]="loading">
+
+                                                <input type="number" class="form-control" min="0" max="255" placeholder="G"
+                                                    [(ngModel)]="baseColorStep.data.g" (ngModelChange)="syncColorFromRGB()"
+                                                    [class.disabled]="loading" [disabled]="loading" [readonly]="loading">
+
+                                                <input type="number" class="form-control" min="0" max="255" placeholder="B"
+                                                    [(ngModel)]="baseColorStep.data.b" (ngModelChange)="syncColorFromRGB()"
+                                                    [class.disabled]="loading" [disabled]="loading" [readonly]="loading">
+                                            </div>
+                                        </div>
                                     </div>
+                                    <div class="col-md-4">
+                                        <!-- Color Picker -->
+                                        <div>
+                                            <label for="colorPicker" class="form-label">Ajuste manual</label>
 
-                                    <!-- RGB -->
-                                    <div class="col-md-6 mb-3">
-                                        <label for="hexOutput" class="form-label">Código RGB</label>
-
-                                        <input type="text" id="rgbOutput" class="form-control"
-                                            value="238, 238, 238" pattern="^#([0-9]{6})$"
-                                            [class.disabled]="loading" [disabled]="loading" [readonly]="loading">
-                                    </div>
-
-                                    <!-- Color Picker -->
-                                    <div class="col-md-6">
-                                        <label for="colorPicker" class="form-label">Ajuste manual</label>
-
-                                        <input type="color" id="colorPicker"
-                                            class="form-control form-control-color"
-                                            value="#eeeeee" title="Selecciona un color"
-                                            [class.disabled]="loading" [disabled]="loading">
+                                            <input type="color" id="colorPicker" value="#FFFFFF"
+                                                class="form-control form-control-color" title="Selecciona un color"
+                                                [(ngModel)]="baseColorStep.data.hex" (ngModelChange)="syncColorFromHEX()"
+                                                [class.disabled]="loading" [disabled]="loading" [readonly]="loading">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -145,8 +159,9 @@
                                     Tipo de esquema cromático
                                 </label>
 
-                                <select id="schemeSelect" class="form-select" required
-                                    [class.disabled]="loading" [disabled]="loading">
+                                <select id="schemeSelect" class="form-select"
+                                        [(ngModel)]="schemeStep.data.type"
+                                        [class.disabled]="loading" [disabled]="loading">
                                     <option value="" selected disabled>Selecciona un esquema...</option>
                                     <option value="complementary">Complementario</option>
                                     <option value="analogic">Análogo</option>
@@ -162,6 +177,7 @@
 
                                 <input type="range" id="numColors" class="form-range"
                                     min="1" max="10" step="1" value="5"
+                                    [(ngModel)]="schemeStep.data.tones"
                                     [class.disabled]="loading" [disabled]="loading" [readonly]="loading">
 
                                 <div class="d-flex justify-content-between">

@@ -1,4 +1,5 @@
 import { Component, ChangeDetectorRef, inject } from '@angular/core';
+import { FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { GeminiService } from '../../services/gemini';
 import { Text2ColorService } from '../../services/text2-color';
@@ -15,31 +16,39 @@ import { of, OperatorFunction } from 'rxjs';
 
 @Component({
   selector: 'app-compose',
-  imports: [RouterLink, StepOverlay, BtnSpinner, ErrorAlert],
+  imports: [
+    RouterLink, FormsModule, ReactiveFormsModule,
+    StepOverlay, BtnSpinner, ErrorAlert
+  ],
   templateUrl: './compose.html',
   styleUrl: './compose.scss',
 })
 export class Compose {
 
+  // Servicios
   geminiService: GeminiService = inject(GeminiService);
   text2ColorService: Text2ColorService = inject(Text2ColorService);
   theColorAPIService: TheColorAPIService = inject(TheColorAPIService);
   cdr = inject(ChangeDetectorRef);
 
+  // Pasos del formulario
   conceptStep: Step<Concept> = this.initConceptStep();
   baseColorStep: Step<Color> = this.initBaseColorStep();
   schemeStep: Step<ColorScheme> = this.initSchemeStep();
   resultStep: Step<ColorPalette> = this.initResultStep();
 
+  // Controles de carga
   loading: boolean = false;
   loadingPrompt: boolean = false;
   loadingColorBase: boolean = false;
   loadingEsquema: boolean = false;
   loadingPaleta: boolean = false;
 
+  constructor() { console.log(this.baseColorStep.data) }
+
 
   onClickBtnPrompt() {
-    this.loading = true
+    this.setLoading(true);
     this.loadingPrompt = true;
     this.conceptStep.error = null;
 
@@ -54,7 +63,7 @@ export class Compose {
   }
 
   onClickBtnColorBase() {
-    this.loading = true
+    this.setLoading(true);
     this.loadingColorBase = true;
     this.conceptStep.error = null;
 
@@ -70,7 +79,7 @@ export class Compose {
   }
   
   onClickBtnDefinirEsquema() {
-    this.loading = true
+    this.setLoading(true);
     this.loadingEsquema = true;
     this.baseColorStep.error = null;
 
@@ -87,7 +96,7 @@ export class Compose {
   }
   
   onClickBtnGenerarPaleta() {
-    this.loading = true
+    this.setLoading(true);
     this.loadingPaleta = true;
     this.schemeStep.error = null;
 
@@ -105,9 +114,33 @@ export class Compose {
   private onFinalize(loaderSetter: (v: boolean) => void): OperatorFunction<any, any> {
     return finalize(() => {
       loaderSetter(false);
-      this.loading = false;
+      this.setLoading(false);
       this.cdr.detectChanges();
     });
+  }
+
+  syncColorFromHEX() {
+    const hex = this.baseColorStep.data?.hex?.replace('#', '');
+
+    if (hex) {
+      this.baseColorStep.data.r = parseInt(hex.substring(0, 2), 16);
+      this.baseColorStep.data.g = parseInt(hex.substring(2, 4), 16);
+      this.baseColorStep.data.b = parseInt(hex.substring(4, 6), 16);
+    }
+  }
+
+  syncColorFromRGB() {
+    const { r, g, b } = this.baseColorStep.data;
+
+    if ([r, g, b].some(v => v < 0 || v > 255 || v == null))
+      return;
+
+    this.baseColorStep.data.hex = (
+        '#' +
+        [r, g, b]
+          .map(v => v.toString(16).padStart(2, '0'))
+          .join('')
+      ).toUpperCase();
   }
 
   restart() {
@@ -116,7 +149,7 @@ export class Compose {
     this.schemeStep = this.initSchemeStep();
     this.resultStep = this.initResultStep();
 
-    this.loading = false;
+    this.setLoading(false);
   }
 
   setStep(step: Step<any>) {
@@ -172,6 +205,10 @@ export class Compose {
 
   private initResultStep(): Step<ColorPalette> {
     return new Step(new ColorPalette(), StepStatus.DISABLED, false);
+  }
+
+  private setLoading(value: boolean) {
+    this.loading = value;
   }
 }
 
