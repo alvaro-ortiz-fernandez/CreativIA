@@ -106,32 +106,32 @@ export class Compose {
     this.loadingPaleta = true;
     this.schemeStep.error = null;
 
-  this.getTheColorAPIService()
-    .getColorPalette(this.baseColorStep.data, this.schemeStep.data, this.conceptStep.data)
-    .pipe(
-      switchMap((palette: ColorPalette) => {
-        this.resultStep.data = palette;
+    this.getTheColorAPIService()
+      .getColorPalette(this.baseColorStep.data, this.schemeStep.data, this.conceptStep.data)
+      .pipe(
+        switchMap((palette: ColorPalette) => {
+          this.resultStep.data = palette;
 
-        return this.getGeminiService().getInterpretation(palette)
-        .pipe(
-          map((interpretation: string) => {
-            this.resultStep.data.interpretation = interpretation;
-            return this.resultStep.data; // seguimos pasando ColorPalette
-          })
-        );
-      }),
-      switchMap((colorPalette: ColorPalette) => {
-        return this.firebaseService.saveColorPalette(colorPalette);
-      }),
-      this.onFinalize(l => (this.loadingPaleta = l))
-    )
-    .subscribe({
-      next: (savedPalette: ColorPalette) => {
-        this.resultStep.data = savedPalette;
-        this.setStep(this.resultStep);
-      },
-      error: (err) => this.schemeStep.error = err
-    });
+          return this.getGeminiService().getInterpretation(palette)
+          .pipe(
+            map((interpretation: string) => {
+              this.resultStep.data.interpretation = interpretation;
+              return this.resultStep.data; // seguimos pasando ColorPalette
+            })
+          );
+        }),
+        switchMap((colorPalette: ColorPalette) => {
+          return this.firebaseService.saveColorPalette(colorPalette);
+        }),
+        this.onFinalize(l => (this.loadingPaleta = l))
+      )
+      .subscribe({
+        next: (savedPalette: ColorPalette) => {
+          this.resultStep.data = savedPalette;
+          this.setStep(this.resultStep);
+        },
+        error: (err) => this.schemeStep.error = err
+      });
   }
 
   private onFinalize(loaderSetter: (v: boolean) => void): OperatorFunction<any, any> {

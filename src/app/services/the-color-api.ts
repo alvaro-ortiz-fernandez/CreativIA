@@ -91,15 +91,15 @@ export class TheColorAPIServiceHttp implements TheColorAPIService {
 })
 export class TheColorAPIServiceMock implements TheColorAPIService {
 
-  getColorPalette(color: Color, scheme: ColorScheme): Observable<ColorPalette> {
-    const palette = this.generatePalette(color, scheme);
+  getColorPalette(color: Color, scheme: ColorScheme, concept: Concept): Observable<ColorPalette> {
+    const palette = this.generatePalette(color, scheme, concept);
     return of(palette).pipe(
       delay(100),
       shareReplay(1)
     );
   }
 
-  private generatePalette(baseColor: Color, scheme: ColorScheme): ColorPalette {
+  private generatePalette(baseColor: Color, scheme: ColorScheme, concept: Concept): ColorPalette {
     const colors: Color[] = [];
 
     for (let i = 0; i < scheme.tones; i++) {
@@ -107,7 +107,7 @@ export class TheColorAPIServiceMock implements TheColorAPIService {
     }
 
     const id = 'mock-' + Math.floor(Math.random() * 1000);
-    return new ColorPalette(id, baseColor, colors, scheme);
+    return new ColorPalette(id, baseColor, colors, scheme, concept);
   }
   
   private variationColor(base: Color, index: number, total: number): Color {
