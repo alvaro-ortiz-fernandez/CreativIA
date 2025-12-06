@@ -11,8 +11,6 @@
             @if (!(colorPalettes | async)) {
                 <app-spinner [size]="SpinnerSize.LG"></app-spinner>
             } @else {
-                <h2 class="text-primary fw-bolder mb-4">03-12-2025</h2>
-
                 @for (colorPalette of (colorPalettes | async); track colorPalette.id) {
                 <div class="card shadow border-0 rounded-4 mb-5">
                     <div class="card-body p-5">
