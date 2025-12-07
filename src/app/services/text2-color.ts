@@ -1,7 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { RestClient } from './rest-client';
-import { delay, mergeMap, Observable, of, shareReplay, throwError, timer } from 'rxjs';
+import { delay, map, Observable, of, shareReplay } from 'rxjs';
 import { Concept } from '../model/colors/Concept';
 import { Color } from '../model/colors/Color';
 
@@ -20,12 +19,52 @@ export interface Text2ColorService {
 })
 export class Text2ColorServiceHttp implements Text2ColorService {
   
-  private restClient = new RestClient(inject(HttpClient), 'https://api.text2color.com');
+  private apiUrl: string = 'https://api.text2color.com';
+  private apiKey = { 'X-API-Key': this.decodeConfig('LCsuKih7Ky4vfCkqLCkvLCB+fisrLiogKykqICx5IS8=') };
+  private httpClient: HttpClient = inject(HttpClient);
   
   text2Color(concept: Concept): Observable<Color> {
-    return timer(1000)
-      .pipe(mergeMap(() => throwError(() => new Error('Operación no implementada'))));
+    let text: string = concept.context
+    if (concept.suggestion) {
+      if (text && !text.endsWith('.'))
+        text += `.`;
+
+      text += ` ${concept.suggestion}`;
+    }
+
+    const headers = this.apiKey;
+
+    // GET /color/sky%20blue
+    return this.httpClient.get<Text2ColorResponse>(
+        this.apiUrl + `/color/${encodeURIComponent(text)}`,
+        { headers }
+      )
+      .pipe(map(response => this.toColor(response)));
   }
+  
+  private toColor(response: Text2ColorResponse): Color {
+    return new Color(
+        response?.color_description,
+        response?.hex_code,
+        response?.rgb?.[0],
+        response?.rgb?.[1],
+        response?.rgb?.[2]
+      );
+  }
+
+  private decodeConfig(encoded: string, key = 24) {
+    return atob(encoded)
+      .split('')
+      .map(c => String.fromCharCode(c.charCodeAt(0) ^ key))
+      .join('');
+  }
+}
+
+export interface Text2ColorResponse {
+  color_description?: string;
+  hex_code?: string;
+  rgb?: number[];
+  cmyk?: number[];
 }
 
 /* =======================================================

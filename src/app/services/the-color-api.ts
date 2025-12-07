@@ -1,34 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { RestClient } from './rest-client';
 import { delay, map, Observable, of, shareReplay } from 'rxjs';
 import { Color } from '../model/colors/Color';
 import { ColorScheme } from '../model/colors/ColorScheme';
 import { ColorPalette } from '../model/colors/ColorPalette';
 import { Concept } from '../model/colors/Concept';
-
-export interface GetSchemeResponse {
-  mode: string;
-  count: number;
-  seed: ApiColor;
-  colors: ApiColor[];
-}
-
-export interface ApiColor {
-  name: ApiValue;
-  hex: ApiValue;
-  rgb: ApiRgb;
-}
-
-export interface ApiRgb {
-  r: number;
-  g: number;
-  b: number;
-}
-
-export interface ApiValue {
-  value: string;
-}
 
 /* =======================================================
  * INTERFAZ
@@ -45,7 +21,8 @@ export interface TheColorAPIService {
 })
 export class TheColorAPIServiceHttp implements TheColorAPIService {
   
-  private restClient = new RestClient(inject(HttpClient), 'https://www.thecolorapi.com');
+  private apiUrl: string = 'https://www.thecolorapi.com';
+  private httpClient: HttpClient = inject(HttpClient);
     
   getColorPalette(color: Color, scheme: ColorScheme, concept: Concept): Observable<ColorPalette> {
     const params = {
@@ -56,7 +33,7 @@ export class TheColorAPIServiceHttp implements TheColorAPIService {
     };
 
     // GET /scheme?hex=0047AB&format=json&mode=monochrome&count=5
-    return this.restClient.get<GetSchemeResponse>('/scheme', params)
+    return this.httpClient.get<GetSchemeResponse>(this.apiUrl + '/scheme', { params })
       .pipe(
         map((response) => this.toColorPalette(response, concept)),
         shareReplay(1)
@@ -81,6 +58,29 @@ export class TheColorAPIServiceHttp implements TheColorAPIService {
         apiColor?.rgb?.b
       );
   }
+}
+
+export interface GetSchemeResponse {
+  mode: string;
+  count: number;
+  seed: ApiColor;
+  colors: ApiColor[];
+}
+
+export interface ApiColor {
+  name: ApiValue;
+  hex: ApiValue;
+  rgb: ApiRgb;
+}
+
+export interface ApiRgb {
+  r: number;
+  g: number;
+  b: number;
+}
+
+export interface ApiValue {
+  value: string;
 }
 
 /* =======================================================

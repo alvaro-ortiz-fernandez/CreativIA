@@ -21,9 +21,6 @@ export class ErrorAlert {
     if (typeof this.error === 'string')
       return this.error;
 
-    if (this.error.message)
-      return this.error.message;
-
-    return JSON.stringify(this.error);
+    return JSON.stringify(this.error, null, 2);
   }
 }

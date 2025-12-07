@@ -1,9 +1,6 @@
 @if (error) {
 <div class="alert alert-danger fade show" [class]="alertClass" role="alert">
-    <span>Se ha producido un error</span>
-    @if (getErrorMessage() !== '') {
-    <span>: [<strong>{{ getErrorMessage() }}</strong>]</span>
-    }
-    <span>.</span>
+    <span>Se ha producido un error:</span>
+    <pre class="mt-2 mb-0 pb-2"><strong>{{ getErrorMessage() }}</strong></pre>
 </div>
 }

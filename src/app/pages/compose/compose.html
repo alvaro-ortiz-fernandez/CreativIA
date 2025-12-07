@@ -65,7 +65,7 @@
                                     (click)="onClickBtnPrompt()"></btn-spinner>
                             </div>
 
-                            <textarea id="aiPrompt" class="form-control" rows="2"
+                            <textarea id="aiPrompt" class="form-control" rows="4"
                                 placeholder="Sugerencia generada por la IA..."
                                 [(ngModel)]="conceptStep.data.suggestion"
                                 [class.disabled]="loading" [disabled]="loading" [readonly]="loading"
@@ -258,7 +258,7 @@
                                 Lectura interpretativa
                             </label>
 
-                            <textarea id="aiInterpretation" class="form-control" rows="4"
+                            <textarea id="aiInterpretation" class="form-control" rows="6"
                                 placeholder="Análisis generado por IA..." disabled readonly
                             >{{ resultStep.data.interpretation }}</textarea>
                         </div>
