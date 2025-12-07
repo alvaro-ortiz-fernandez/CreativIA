@@ -1,6 +1,6 @@
 # Demo online
 <h3 align="center">
-    <a href="https://google.es/">https://google.es/</a>
+    <a href="https://alvaro-ortiz-fernandez.github.io/CreativIA/" target="_blank">https://alvaro-ortiz-fernandez.github.io/CreativIA/</a>
 </h3>
 
 # Secciones de la aplicación
